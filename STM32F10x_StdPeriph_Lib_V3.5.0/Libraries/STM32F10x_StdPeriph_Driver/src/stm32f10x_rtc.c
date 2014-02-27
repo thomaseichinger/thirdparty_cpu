@@ -337,10 +337,6 @@ void RTC_ClearITPendingBit(uint16_t RTC_IT)
   */
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 //
 // Copy pasted from version 2.0.x
 //

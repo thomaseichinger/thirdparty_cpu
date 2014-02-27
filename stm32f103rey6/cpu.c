@@ -9,6 +9,9 @@
 #include "stm32f10x_tim.h"
 #include "stm32f10x.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 int inISR(void)
 {
     return (__get_IPSR() & 0xFF);
@@ -65,7 +68,7 @@ void WWDG_Handler(void)
 __attribute__((naked))
 void NMI_Handler(void)
 {
-    puts(__PRETTY_FUNCTION__);
+    DEBUG(__PRETTY_FUNCTION__);
 
     while (1);
 }
@@ -73,7 +76,7 @@ void NMI_Handler(void)
 __attribute__((naked))
 void MemManage_Handler(void)
 {
-    puts(__PRETTY_FUNCTION__);
+    DEBUG(__PRETTY_FUNCTION__);
 
     while (1);
 }
@@ -81,7 +84,7 @@ void MemManage_Handler(void)
 __attribute__((naked))
 void DebugMon_Handler(void)
 {
-    puts(__PRETTY_FUNCTION__);
+    DEBUG(__PRETTY_FUNCTION__);
 
     while (1);
 }
@@ -89,56 +92,66 @@ void DebugMon_Handler(void)
 __attribute__((naked))
 void SysTick_Handler(void)
 {
-    puts(__PRETTY_FUNCTION__);
+    DEBUG(__PRETTY_FUNCTION__);
 
     while (1);
 }
 
+extern void rtc_handler(void);
+extern void rtcalarm_handler(void);
+extern void spi1_handler(void);
+extern void exti4_handler(void);
+
 void RTC_IRQHandler(void)
 {
-    puts(__PRETTY_FUNCTION__);
-    if(RTC_GetFlagStatus(RTC_IT_ALR) != RESET)
-    {
-      RTC_ClearITPendingBit(RTC_IT_ALR);      //Clear RTC Alarm interrupt pending bit
-      RTC_WaitForLastTask();                  //Wait until last write operation on RTC registers has finished
-    }
+    DEBUG("%s\n",__PRETTY_FUNCTION__);
+    rtc_handler();
+    // if(RTC_GetFlagStatus(RTC_IT_ALR) != RESET)
+//     {
+//       RTC_ClearITPendingBit(RTC_IT_ALR);      //Clear RTC Alarm interrupt pending bit
+//       RTC_WaitForLastTask();                  //Wait until last write operation on RTC registers has finished
+//     }
 }
 
 void RTCAlarm_IRQHandler(void)
 {
-    puts(__PRETTY_FUNCTION__);
-  debugpins_isr_set();
-  if(EXTI_GetITStatus(EXTI_Line17) != RESET)
-  {
-	EXTI_ClearITPendingBit(EXTI_Line17);
-        radiotimer_isr();
-  }
-  debugpins_isr_clr();
+    DEBUG("%s 1\n",__PRETTY_FUNCTION__);
+    rtcalarm_handler();
+    DEBUG("%s 2\n",__PRETTY_FUNCTION__);
+  // // debugpins_isr_set();
+//   if(EXTI_GetITStatus(EXTI_Line17) != RESET)
+//   {
+//     EXTI_ClearITPendingBit(EXTI_Line17);
+//         radiotimer_isr();
+//   }
+//   // debugpins_isr_clr();
 }
 
 void SPI1_IRQHandler(void)
 {
-    puts(__PRETTY_FUNCTION__);
-  debugpins_isr_set();
-  if(SPI_I2S_GetFlagStatus(SPI1,SPI_I2S_FLAG_RXNE) != RESET)
-  {
-    spi_isr();
-  }
-  debugpins_isr_clr();
+    DEBUG("%s\n",__PRETTY_FUNCTION__);
+    spi1_handler();
+  // // debugpins_isr_set();
+//   if(SPI_I2S_GetFlagStatus(SPI1,SPI_I2S_FLAG_RXNE) != RESET)
+//   {
+//     spi_isr();
+//   }
+//   // debugpins_isr_clr();
 }
 
 void EXTI4_IRQHandler(void)
 {
-    puts(__PRETTY_FUNCTION__);
-  if(EXTI_GetITStatus(EXTI_Line4) != RESET){
-    debugpins_isr_set();
-
-    //leds_error_toggle();
-    EXTI_ClearITPendingBit(EXTI_Line4);
-
-    //RCC_Wakeup();
-    radio_isr();
-
-    debugpins_isr_clr();
-  }
+    DEBUG("%s\n",__PRETTY_FUNCTION__);
+    exti4_handler();
+  // if(EXTI_GetITStatus(EXTI_Line4) != RESET){
+//     // debugpins_isr_set();
+// 
+//     //leds_error_toggle();
+//     EXTI_ClearITPendingBit(EXTI_Line4);
+// 
+//     //RCC_Wakeup();
+//     radio_isr();
+// 
+//     // debugpins_isr_clr();
+//   }
 }
