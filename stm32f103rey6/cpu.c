@@ -60,3 +60,35 @@ void WWDG_Handler(void)
 
     while (1);
 }
+
+__attribute__((naked))
+void NMI_Handler(void)
+{
+    puts(__PRETTY_FUNCTION__);
+
+    while (1);
+}
+
+__attribute__((naked))
+void MemManage_Handler(void)
+{
+    puts(__PRETTY_FUNCTION__);
+
+    while (1);
+}
+
+__attribute__((naked))
+void DebugMon_Handler(void)
+{
+    puts(__PRETTY_FUNCTION__);
+
+    while (1);
+}
+
+__attribute__((naked))
+void SysTick_Handler(void)
+{
+    puts(__PRETTY_FUNCTION__);
+
+    while (1);
+}
