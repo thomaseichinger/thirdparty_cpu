@@ -10,6 +10,6 @@
 
 #include "stm32f10x.h"
 
-#define F_CPU					        72000000  						  ///< CPU target speed in Hz
+#define F_CPU					        (72000000U)  						  ///< CPU target speed in Hz
 
 #endif /* STM32F103REY6_H_ */

@@ -30,46 +30,77 @@ void cpu_switch_context_exit(void)
 }
 
 
+
 void thread_yield(void)
 {
-    asm("svc 0x01\n");
+    // asm("svc 0x01\n");
+    
+    if (inISR()) {
+        SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;    // set PendSV Bit
+    } else {
+        asm("svc 0x01\n");                      // trigger SVC interrupt, which will trigger the pendSV (needed?)
+    }
 }
 
+__attribute__((naked))
+void DefaultHandler(void)
+{
+    puts(__PRETTY_FUNCTION__);
+    while (1) {}
+}
+
+__attribute__((naked))
+void PendSV_Handler(void)
+{
+    save_context();
+    asm("bl sched_run\n");
+    puts(__PRETTY_FUNCTION__);
+    restore_context();
+}
 
 __attribute__((naked))
 void SVC_Handler(void)
 {
-    save_context();
-    asm("bl sched_run");
-    /* call scheduler update active_thread variable with pdc of next thread
-     * the thread that has higest priority and is in PENDING state */
-    restore_context();
+    /* {r0-r3,r12,LR,PC,xPSR} are saved automatically on exception entry */
+//    asm("push   {LR}");
+    /* save exception return value */
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+
+//    asm("pop    {r0}"               );      /* restore exception retrun value from stack */
+    asm("bx     LR"                 );      /* load exception return value to pc causes end of exception*/
+    /* {r0-r3,r12,LR,PC,xPSR} are restored automatically on exception return */
+    
+    // save_context();
+//     asm("bl sched_run");
+//     /* call scheduler update active_thread variable with pdc of next thread
+//      * the thread that has higest priority and is in PENDING state */
+//     restore_context();
 }
 
 /* kernel functions */
-void ctx_switch(void)
-{
-    /* Save return address on stack */
-    /* stmfd   sp!, {lr} */
-
-    /* disable interrupts */
-    /* mov     lr, #NOINT|SVCMODE */
-    /* msr     CPSR_c, lr */
-    /* cpsid 	i */
-
-    /* save other register */
-    asm("nop");
-
-    asm("mov r12, sp");
-    asm("stmfd r12!, {r4-r11}");
-
-    /* save user mode stack pointer in *active_thread */
-    asm("ldr     r1, =active_thread"); /* r1 = &active_thread */
-    asm("ldr     r1, [r1]"); /* r1 = *r1 = active_thread */
-    asm("str     r12, [r1]"); /* store stack pointer in tasks pdc*/
-
-    sched_task_return();
-}
+// void ctx_switch(void)
+// {
+//     /* Save return address on stack */
+//     /* stmfd   sp!, {lr} */
+// 
+//     /* disable interrupts */
+//     /* mov     lr, #NOINT|SVCMODE */
+//     /* msr     CPSR_c, lr */
+//     /* cpsid     i */
+// 
+//     /* save other register */
+//     asm("nop");
+// 
+//     asm("mov r12, sp");
+//     asm("stmfd r12!, {r4-r11}");
+// 
+//     /* save user mode stack pointer in *active_thread */
+//     asm("ldr     r1, =active_thread"); /* r1 = &active_thread */
+//     asm("ldr     r1, [r1]"); /* r1 = *r1 = active_thread */
+//     asm("str     r12, [r1]"); /* store stack pointer in tasks pdc*/
+// 
+//     sched_task_return();
+// }
 /* call scheduler so active_thread points to the next task */
 extern void main(void);
 extern void auto_init(void);

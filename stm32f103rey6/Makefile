@@ -1,7 +1,7 @@
 MODULE =cpu
 #include $(MAKEBASE)/Makefile.base
 
-DIRS =
+DIRS = 
 ifneq (,$(findstring cpu_drivers,$(USEMODULE)))
     DIRS += drivers
 endif
