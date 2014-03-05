@@ -9,6 +9,9 @@
 #include "sched.h"
 #include "cpu.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 extern void sched_task_exit(void);
 void sched_task_return(void);
 
@@ -45,7 +48,7 @@ void thread_yield(void)
 __attribute__((naked))
 void DefaultHandler(void)
 {
-    puts(__PRETTY_FUNCTION__);
+    DEBUG("%s\n",__PRETTY_FUNCTION__);
     while (1) {}
 }
 
@@ -54,7 +57,7 @@ void PendSV_Handler(void)
 {
     save_context();
     asm("bl sched_run\n");
-    puts(__PRETTY_FUNCTION__);
+    DEBUG("%s\n",__PRETTY_FUNCTION__);
     restore_context();
 }
 
