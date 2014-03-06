@@ -29,6 +29,9 @@
 
 #include "board.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 static inline void irq_handler(tim_t timer, TIM_TypeDef *dev);
 
 typedef struct {
@@ -103,6 +106,7 @@ int timer_set(tim_t dev, int channel, int timeout)
             timer = TIMER_1_DEV;
             break;
     }
+    DEBUG("set timer %hu to %lu + %lu\n", channel, now, timeout);
     switch (channel) {
         case 1:
             TIM_SetCompare1(timer, now + timeout - 1);
@@ -234,18 +238,22 @@ static inline void irq_handler(tim_t timer, TIM_TypeDef *dev)
         TIM_ClearITPendingBit(dev, TIM_IT_CC1);
         TIM_ITConfig(dev, TIM_IT_CC1, DISABLE);
         config[timer].cb(1);
+        DEBUG("Firing 0 at %lu\n", TIM_GetCounter(TIMER_0_DEV));
     } else if (TIM_GetITStatus(dev, TIM_IT_CC2) == SET) {
         TIM_ClearITPendingBit(dev, TIM_IT_CC2);
         TIM_ITConfig(dev, TIM_IT_CC2, DISABLE);
         config[timer].cb(2);
+        DEBUG("Firing 1 at %lu\n", TIM_GetCounter(TIMER_0_DEV));
     } else if (TIM_GetITStatus(dev, TIM_IT_CC3) == SET) {
         TIM_ClearITPendingBit(dev, TIM_IT_CC3);
         TIM_ITConfig(dev, TIM_IT_CC3, DISABLE);
         config[timer].cb(3);
+        DEBUG("Firing 2 at %lu\n", TIM_GetCounter(TIMER_0_DEV));
     } else if (TIM_GetITStatus(dev, TIM_IT_CC4) == SET) {
         TIM_ClearITPendingBit(dev, TIM_IT_CC4);
         TIM_ITConfig(dev, TIM_IT_CC4, DISABLE);
         config[timer].cb(4);
+        DEBUG("Firing 3 at %lu\n", TIM_GetCounter(TIMER_0_DEV));
     }
 }
 

@@ -115,9 +115,9 @@ void RTC_IRQHandler(void)
 
 void RTCAlarm_IRQHandler(void)
 {
-    DEBUG("%s 1\n",__PRETTY_FUNCTION__);
+    // DEBUG("%s 1\n",__PRETTY_FUNCTION__);
     rtcalarm_handler();
-    DEBUG("%s 2\n",__PRETTY_FUNCTION__);
+    // DEBUG("%s 2\n",__PRETTY_FUNCTION__);
   // // debugpins_isr_set();
 //   if(EXTI_GetITStatus(EXTI_Line17) != RESET)
 //   {
