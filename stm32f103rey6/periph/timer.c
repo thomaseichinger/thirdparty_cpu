@@ -21,7 +21,6 @@
 
 #include <stdlib.h>
 
-#warning "Which header needed?s"
 #include "stm32f10x.h"
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_tim.h"
